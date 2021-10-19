@@ -1,0 +1,71 @@
+
+.form-container {
+
+}
+
+.form-content {
+  width: 90%;
+  max-width: 720px;
+  margin: 30px auto;
+}
+
+.form-content label {
+  display: block;
+}
+
+.form-content input, .form-content select, .form-content textarea,
+.form-content button {
+  width: 100%;
+
+  display: block;
+  margin-top: 10px;
+  border: #5c5c5c 1.5px solid;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.form-content input:focus, .form-content select:focus,
+.form-content textarea:focus, .form-content button:focus {
+  border-color: #af69ef;
+}
+
+.form-content textarea {
+  height: 100px;
+}
+
+.form-content .action {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.form-content button[type=submit] {
+  padding: 12px 16px;
+  margin: 8px 0;
+
+  width: auto;
+  background-color: #7c3abc;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  border: 1px solid #7c3abc;
+}
+
+.form-content button[type=button] {
+  padding: 12px 16px;
+  margin: 8px 0;
+  
+  width: auto;
+  background-color: #ffffff;
+  color: #7c3abc;
+  font-size: 16px;
+  font-weight: bold;
+  border: 1px solid #7c3abc;
+}
+
+.form-content button:hover {
+  background-color: #af69ef;
+  color: #ffffff;
+  border: 1px solid #af69ef;
+}
+
