@@ -2,169 +2,111 @@
 
 
 var ML_CLAIM_REPORT_URL = "http://127.0.0.1:8000/api/v1/ml/claim-report/";
-var DETAIL_TITLE_SELECTOR = "";
-var ESC_KEY = 27;
-
-function setDetailsFromRelation(relation) {
-    'use strict';
-    // console.log(relation);
-    // console.log(claim);
-  
-    var selectedRelation = document.getElementById("evi-"+relation._id);
-    var evidenceList = document.querySelector(".evidence-list");
-
-    evidenceList.innerHTML = evidenceList.innerHTML + (
-        "<li><a href=#"+relation+">"+selectedRelation.innerText+"</li>");
-
-    selectedRelation.classList.add("focus");
-    selectedRelation.classList.add("supports");
-}
-
-function hideDetails() {
-    'use strict';
-    var selectedClaim = document.querySelector("section .select-claim");
-    var evidenceList = document.querySelector(".evidence-list");
-
-    selectedClaim.innerHTML = "";
-    evidenceList.innerHTML = "";
-
-    var sectionLeft = document.querySelector(".section-left-div");
-    sectionLeft.classList.remove("film");
-}
-
-function setDetailsFromClaim(claim) {
-    'use strict';
-    hideDetails();
-    var selectedClaim = document.querySelector("section .select-claim");
-    // selectedClaim.textContent = "<a href=#"+claim.id+">"+claim.textContent+"</a>";
-    selectedClaim.innerHTML = "<a href=#"+claim.id+">"+claim.textContent+"</a>";
-    claim.classList.add("focus");
-    
-        
-    //console.log(data_map);
-    //console.log(data_map[claim.id]);
-    var relations = data_map[claim.id].children;
-    //console.log(relations);
-
-    //var relations = claim.getAttribute("data-related").split(" ");
-    if (relations) {
-        relations.forEach(setDetailsFromRelation);
-    } else {
-        ;
-  }
-
-    var sectionLeft = document.querySelector(".section-left-div");
-    sectionLeft.classList.add("film");
-  
-}
-
-// function showDetails() {
-//   'use strict';
-//   var frame = document.querySelector(DETAIL_FRAME_SELECTOR);
-//   document.body.classList.remove(HIDDEN_DETAIL_CLASS);
-
-//   frame.classList.add(TINY_EFFECT_CLASS);
-//   setTimeout(function () {
-//     frame.classList.remove(TINY_EFFECT_CLASS);
-//   }, 50);
-// }
-
-function addClaimClickHandler(claim) {
-    'use strict';
-    claim.addEventListener('click', function (event) {
-        event.preventDefault();
-        setDetailsFromClaim(claim);
-    });
-}
-
-function getClaimArray() {
-    'use strict';
-    var claims = document.querySelectorAll(".claim-txt");
-    var claimArray = [].slice.call(claims);
-    return claimArray;
-}
-
-function addKeyPressHandler() {
-    'use strict';
-    document.body.addEventListener('keyup', function (event) {
-        event.preventDefault();
-        console.log(event.keyCode);
-
-        if (event.keyCode === ESC_KEY) {
-            hideDetails();
-        }
-    });
-}
-
-function initializeEvents() {
-    'use strict';
-    var claims = getClaimArray();
-    claims.forEach(addClaimClickHandler);
-    addKeyPressHandler();
-}
 
 var data_map = [];
 
-function profile_claims() {
-    $.ajax({
-        "async": true,
-        "type": "POST",
-        "url": ML_CLAIM_REPORT_URL,
-        "data": {"text": "hello"},
-        "dataType": "json",
-        "success": function(data){
-            var query_text = data.text;
-            var result = data.result;
 
-        var itemId = ""
-
-        result.forEach(function(r) {
-            if (r.label === "CLAIM") {
-                console.log("0");
-                itemId = `clm-${r._id}`;
-                query_text = query_text.replace(r.text,
-                    `<span id=${itemId} class="claim-txt"><a>${r.text}</a></span>`)
-            }
-            else if (r.label === "EVIDENCE") {
-                console.log("1");
-                itemId = `evi-${r._id}`;
-                query_text = query_text.replace(r.text,
-                    `<span id=${itemId} class="evidence-txt">${r.text}</span>`)
-            }
-
-            data_map[itemId] = r;// = data_map.concat([{itemId: r}]);
-        });
-
-        while (query_text.search("\n") > 0) {
-            query_text = query_text.replace("\n", "<br /><br />");
-        }
-
-        $(".section-left-div").html(`<p>${query_text}</p>`);
-
-        initializeEvents();
-        },
-        error: function(msg) {
-            // modal.append(msg);
-        }
-    });
+function fillLeftScreen(query_text, result) {
+  'use strict';
+  query_text = updateQueryText(query_text, result);
+  $("#query-text").html(`${query_text.trimLeft("\n")}`).focus();
 }
 
+function updateQueryText(query_text, result) {
+  'use strict';
+  result.forEach(function(r) {
+    var itemId = ""
 
-/*
-<!--
-    //var claims = data.result.filter(function(dt) {
-          //console.log(dt);
-          //return dt.label === "CLAIM";
-        //});
-        //console.log(claims);
+    if (r.label === "CLAIM") {
+      itemId = `clm-${r._id}`;
+      query_text = query_text.replace(r.text,
+        `<a id=${itemId} class="claim-text" onclick="fillRightScreen(this);">${r.text}</a>`)
+    }
+    else if (r.label === "EVIDENCE") {
+      itemId = `evi-${r._id}`;
+      query_text = query_text.replace(r.text,
+        `<span id=${itemId} class="evidence-text">${r.text}</span>`)
+    }
 
+    data_map[itemId] = r;
+  });
+  return query_text
+}
 
-        //$("#select-claim").text(data);//.result[0].text);
-        //$("#select-claim").css("background", "yellow").text(""+data);//.html(data);
+function fillRightScreen(claim) {
+  'use strict';
+  clearRightScreen();
 
-    -->
-  <!-- // data = {{ result.result }}; -->
+  $("#selected-claim-text").html(`<a href=#${claim.id}>${claim.textContent}</a>`).focus();
 
-  <!-- // var originalText = "{{ query_text|safe }}"; -->
-*/
+  var evidenceList = data_map[claim.id].children;
+  var evidenceListTag = $(".evidence-list");
+  if (evidenceList.length > 0) {
+    evidenceList.forEach(function(r) {
+      var voteClass = "";
+      if (r.vote == "SUPPORTS") {
+        voteClass = "vote-supports";
+      }
+      else if (r.vote == "REFUTES") {
+        voteClass = "vote-refutes"
+      }
+      else {
+        voteClass = "vote-notenoughinfo"
+      }
+      $("#evi-"+r._id).addClass(voteClass);
+
+      evidenceListTag.html(
+        `${evidenceListTag.html()}<li><a href=#evi-${r._id}>${r.text}</li>`);
+    });
+  }
+  else {
+    evidenceListTag.html(`<li>None was found</li>`);
+  }
+
+  $(".right-screen *").removeClass("hidden");
+}
+
+function clearRightScreen() {
+  'use strict';
+
+  $("#selected-claim-text").html("");
+  $(".evidence-list").html("");
+  $(".right-screen *").addClass("hidden");
+  $(".evidence-text").removeClass(["vote-supports", "vote-refutes", "vote-notenoughinfo"]);
+}
+
+function profile_claims(formData) {
+  $.ajax({
+    "async": true,
+    "type": "POST",
+    "url": ML_CLAIM_REPORT_URL,
+    "data": formData,
+    "dataType": "json",
+    "encode": true,
+  })
+  .done(function(data) {
+    var query_text = data.text;
+    var result = data.result;
+
+    $(".header-content").removeClass("hidden");
+    $(".h-content").removeClass("hidden");
+    fillLeftScreen(query_text, result);
+  })
+  .fail(function(msg) {
+    console.log(msg);
+  });
+}
+
+$(document).ready(function() {
+  $("form").submit(function(event) {
+    var formData = {
+      text: $("#form-field-text").val(),
+      url: $("#form-field-url").val(),
+      file: $("#form-field-file").val(),
+    };
+
+    profile_claims(formData);
+    event.preventDefault();
+  });
+});
 

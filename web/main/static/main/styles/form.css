@@ -1,12 +1,14 @@
 
 .form-container {
-
 }
 
 .form-content {
   width: 90%;
-  max-width: 720px;
-  margin: 30px auto;
+  max-width: 960px;
+  margin: 20px auto;
+  padding: 20px;
+
+  background-color: #fff;
 }
 
 .form-content label {
@@ -31,6 +33,9 @@
 
 .form-content textarea {
   height: 100px;
+
+  resize: vertical;
+  font-family: Arial, sans-serif;
 }
 
 .form-content .action {

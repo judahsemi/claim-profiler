@@ -9,13 +9,13 @@
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
   {% block style %}
-  <link rel="stylesheet" type="text/css" href="{% static 'main/styles/base.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'main/styles/main.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'main/styles/form.css' %}">
   {% endblock %}
 
   {% block scripts %}
   <script type="text/javascript" src="{% static 'main/scripts/jquery-3.6.0.min.js' %}"></script>
+  <script src="{% static 'main/scripts/main.js' %}" charset="utf-8"></script>
   {% endblock %}
   
   {% block title %}
@@ -26,10 +26,10 @@
   <header>
     {% block nav %}
     <nav>
-      <span><a href="{% url 'index' %}">Home</a></span>
-      <span><a href="{% url 'index' %}">API</a></span>
-      <span><a href="{% url 'index' %}">Developers</a></span>
-      <span><a href="{% url 'index' %}">Contact</a></span>
+      <div class="nav-list">
+        <span><a href="https://linkedin.com/in/banjokojudah">Linkedin</a></span>
+        <span><a href="https://github.com/judahsemi/claim-profiler">Github</a></span>
+      </div>
     </nav>
     </section>
     {% endblock %}
@@ -41,44 +41,57 @@
 
   <main>
     {% block content %}
+    <section class="container">
+      <div class="header-content">
+        <h2>Claim Profiler</h2>
+      </div>
+    </section>
+
     <section class="form-container">
       <form class="form-content" action="" method="post" enctype="multipart/form-data">
-        <h2>Claim Profiler</h2>
-
         {% csrf_token %}
 
         <p>
           <label for="text">Text</label>
-          <textarea name="text"></textarea>
+          <textarea name="text" id="form-field-text" autofocus></textarea>
         </p>
         <p>
           <label for="url">URL</label>
-          <input type="url" name="url">
+          <input type="url" name="url" id="form-field-url">
         </p>
         <p>
           <label for="file">File</label>
-          <input type="file" name="file">
+          <input type="file" name="file" id="form-field-file">
         </p>
 
         <div class="action">
-          <a href="{% url 'index' %}"><button type="button">Cancel</button></a>
-          <button type="submit">profile</button>
+          <span></span>
+          <button type="submit">Profile</button>
         </div>
       </form>
     </section>
 
     <section class="container">
-      <div class="content">
-        <section class="section-left">
-          <div class="section-left-div">
-          </div>
-        </section>
-        
-        <section class="section-right">
-          <button class="create-btn" onclick="hideDetails();">Back/Clear/Reset</button>
-          <b><p id="select-claim" class="select-claim"></p></b>
-          <ul class="evidence-list"></ul>
-        </section>
+      <div class="header-content hidden">
+        <h2>Details</h2>
+        <span class="clear-text" onclick="clearRightScreen();">clear</span>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="h-content hidden">
+        <div class="left-screen">
+          <span><b>Original text</b></span>
+          <p id="query-text"></p>
+        </div>
+
+        <div class="right-screen">
+          <span class="hidden"><b>Claim</b></span>
+          <p id="selected-claim-text" class="hidden"></p>
+
+          <span class="hidden"><b>Mentioned evidence</b></span>
+          <ul class="evidence-list hidden"></ul>
+        </div>
       </div>
     </section>
     {% endblock %}
@@ -89,12 +102,6 @@
     {% block footer %}
     {% endblock %}
   </footer>
-
-
-  <script src="{% static 'main/scripts/main.js' %}" charset="utf-8"></script>
-  <script>
-    profile_claims();
-  </script>
 </body>
 </html>
 
